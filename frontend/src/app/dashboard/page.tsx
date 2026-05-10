@@ -20,7 +20,7 @@ function Sidebar({ active }: { active: string }) {
     <aside style={{ width: 220, borderRight: "1px solid oklch(1 0 0 / 0.06)", padding: "18px 14px", background: "oklch(0.165 0.012 255)", display: "flex", flexDirection: "column", gap: 0, minHeight: "100vh", position: "fixed", top: 0, left: 0, bottom: 0, zIndex: 20 }}>
       <Link href="/" style={{ textDecoration: "none" }}><VeloraMark size={20} /></Link>
       <nav style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 2 }}>
-        {[["chart", "Overview", "/dashboard"], ["bolt", "Payments", "/dashboard"], ["link", "Links", "/dashboard"], ["spark", "Analytics", "/dashboard"]].map(([ic, label, href], i) => {
+        {[["chart", "Overview", "/dashboard"], ["bolt", "Payments", "/dashboard"], ["link", "Links", "/dashboard"]].map(([ic, label, href], i) => {
           const isActive = i === 0;
           return (
             <Link key={label} href={href} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", borderRadius: 10, background: isActive ? "oklch(1 0 0 / 0.06)" : "transparent", color: isActive ? "var(--ink)" : "var(--ink-2)", textDecoration: "none", fontSize: 13, borderLeft: isActive ? "2px solid var(--acid)" : "2px solid transparent" }}>

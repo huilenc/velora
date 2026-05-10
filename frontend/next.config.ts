@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@lifi/widget", "@lifi/sdk"],
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Anchor uses Node.js builtins — polyfill them as empty in the browser
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,

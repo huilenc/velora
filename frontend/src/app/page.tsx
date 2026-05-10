@@ -26,17 +26,18 @@ function Nav() {
   );
 }
 
-// ── Connect Wallet button — redirects immediately on connect ──────────────
+// ── Connect Wallet button — shows confirm dialog before dashboard ─────────
 function WalletCTA({ size = 44 }: { size?: number }) {
-  const { publicKey } = useWallet();
+  const { publicKey, disconnect } = useWallet();
   const router = useRouter();
   const [mounted, setMounted] = React.useState(false);
+  const [showConfirm, setShowConfirm] = React.useState(false);
+
   React.useEffect(() => setMounted(true), []);
 
-  // As soon as wallet connects, go straight to dashboard
   React.useEffect(() => {
-    if (publicKey) router.push("/dashboard");
-  }, [publicKey, router]);
+    if (publicKey) setShowConfirm(true);
+  }, [publicKey]);
 
   if (!mounted) {
     return (
@@ -47,7 +48,49 @@ function WalletCTA({ size = 44 }: { size?: number }) {
       }} />
     );
   }
-  return <WalletMultiButton style={{ height: size }}>Connect Wallet</WalletMultiButton>;
+
+  return (
+    <>
+      <WalletMultiButton style={{ height: size }}>Connect Wallet</WalletMultiButton>
+
+      {showConfirm && publicKey && (
+        <div
+          onClick={() => { setShowConfirm(false); disconnect(); }}
+          style={{ position: "fixed", inset: 0, zIndex: 200, background: "oklch(0.10 0.01 255 / 0.72)", backdropFilter: "blur(14px)", display: "grid", placeItems: "center", animation: "fadeIn .2s ease-out" }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ width: 400, padding: "28px 28px 24px", borderRadius: 22, background: "linear-gradient(180deg, oklch(0.22 0.014 255), oklch(0.17 0.012 255))", border: "1px solid oklch(1 0 0 / 0.12)", boxShadow: "0 40px 100px -20px oklch(0 0 0 / 0.6)", animation: "popIn .35s cubic-bezier(.16,1,.3,1)" }}
+          >
+            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "oklch(0.92 0.24 145 / 0.15)", border: "1px solid oklch(0.92 0.24 145 / 0.4)", display: "grid", placeItems: "center", color: "var(--acid)", marginBottom: 16 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12V22H4V12" /><path d="M22 7H2v5h20V7z" /><path d="M12 22V7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></svg>
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 500, marginBottom: 8 }}>Wallet connected</div>
+            <div style={{ fontSize: 13, color: "var(--ink-3)", marginBottom: 6, fontFamily: "var(--font-mono), monospace", background: "oklch(1 0 0 / 0.03)", padding: "8px 10px", borderRadius: 8, border: "1px solid oklch(1 0 0 / 0.06)", wordBreak: "break-all" }}>
+              {publicKey.toBase58().slice(0, 20)}…{publicKey.toBase58().slice(-8)}
+            </div>
+            <div style={{ fontSize: 13, color: "var(--ink-2)", marginBottom: 22, lineHeight: 1.5 }}>
+              Proceed to your PayLink dashboard to create and manage payment links.
+            </div>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button
+                onClick={() => { setShowConfirm(false); router.push("/dashboard"); }}
+                style={{ flex: 1, height: 44, borderRadius: 12, background: "var(--acid)", color: "#0a0c0a", border: "none", fontWeight: 600, fontSize: 14, cursor: "pointer" }}
+              >
+                Go to Dashboard →
+              </button>
+              <button
+                onClick={() => { setShowConfirm(false); disconnect(); }}
+                style={{ height: 44, padding: "0 16px", borderRadius: 12, background: "oklch(1 0 0 / 0.05)", border: "1px solid oklch(1 0 0 / 0.10)", color: "var(--ink-2)", fontSize: 14, cursor: "pointer" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
 // ── Hero ───────────────────────────────────────────────────────────────────
