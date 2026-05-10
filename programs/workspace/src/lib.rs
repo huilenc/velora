@@ -4,7 +4,7 @@ use anchor_spl::{
     token::{self, Mint, Token, TokenAccount},
 };
 
-declare_id!("8SuWfRSyqJxpXXQ57S2hmiwKgFqpf877Gyf89yky8KhC");
+declare_id!("CoZag4akYjdga6TLTaDRXSv49ArbJjWtz5gFiJNNNNpG");
 
 #[program]
 pub mod workspace {

@@ -42,7 +42,7 @@ export default function Dashboard() {
           ].map((link) => (
             <div key={link.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4 flex items-center justify-between">
               <div>
-                <p className="font-mono text-sm text-gray-400">paylink.xyz/pay/{link.id}</p>
+                <p className="font-mono text-sm text-gray-400">velora.xyz/pay/{link.id}</p>
                 <p className="font-medium">{link.desc}</p>
               </div>
               <div className="text-right">

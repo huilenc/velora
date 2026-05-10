@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createLink, getLinkById, markAsPaid, db } from "./db";
+import { x402Gate } from "./x402";
 
 export const router = Router();
 
@@ -37,4 +38,15 @@ router.post("/webhook/:id", (req, res) => {
     return;
   }
   res.json({ success: true, link });
+});
+
+// x402-gated resource — returns 402 without payment proof, 200 after on-chain verification
+// :onchainParam format: "{base58seller}-{linkId}"
+router.get("/resource/:onchainParam", x402Gate, (req, res) => {
+  res.json({
+    unlocked: true,
+    content: "Access granted. This is the protected resource content.",
+    link: req.params["onchainParam"],
+    unlockedAt: new Date().toISOString(),
+  });
 });

@@ -6,19 +6,19 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-workspace = "8SuWfRSyqJxpXXQ57S2hmiwKgFqpf877Gyf89yky8KhC"
+workspace = "CoZag4akYjdga6TLTaDRXSv49ArbJjWtz5gFiJNNNNpG"
 
 [programs.testnet]
-workspace = "8SuWfRSyqJxpXXQ57S2hmiwKgFqpf877Gyf89yky8KhC"
+workspace = "CoZag4akYjdga6TLTaDRXSv49ArbJjWtz5gFiJNNNNpG"
 
 [programs.devnet]
-workspace = "8SuWfRSyqJxpXXQ57S2hmiwKgFqpf877Gyf89yky8KhC"
+workspace = "CoZag4akYjdga6TLTaDRXSv49ArbJjWtz5gFiJNNNNpG"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Testnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

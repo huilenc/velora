@@ -4,7 +4,7 @@ export default function PayPage({ params }: { params: { id: string } }) {
       <div className="max-w-lg w-full space-y-6">
 
         <div className="text-center space-y-2">
-          <p className="text-gray-500 text-sm font-mono">paylink.xyz/pay/{params.id}</p>
+          <p className="text-gray-500 text-sm font-mono">velora.xyz/pay/{params.id}</p>
           <h1 className="text-4xl font-bold">Pago solicitado</h1>
         </div>
 

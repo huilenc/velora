@@ -5,7 +5,7 @@ import "./globals.css";
 const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PayLink — Cobra desde cualquier chain",
+  title: "Velora — Cobra desde cualquier chain",
   description: "Generá un link de pago. Tu cliente paga con lo que tenga. Vos recibís USDC en Solana.",
 };
 
