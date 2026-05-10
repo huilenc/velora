@@ -5,8 +5,11 @@ import Link from "next/link";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from "@solana/spl-token";
+import { PublicKey, Transaction, VersionedTransaction } from "@solana/web3.js";
+import { AnchorProvider, Program } from "@coral-xyz/anchor";
 import BN from "bn.js";
 import { useAnchorProgram } from "@/lib/program";
+import { IDL } from "@/lib/idl";
 import { getConfigPda, getPaymentLinkPda, getEscrowVaultPda, decodeLinkParam } from "@/lib/pdas";
 import { USDC_MINT, lamportsToUsdc } from "@/lib/constants";
 import { Icon, ChainGlyph, VeloraMark, StatusDot } from "@/components/ui";
@@ -51,7 +54,7 @@ export default function PayPage({ params }: { params: Promise<{ id: string }> })
   const { connection } = useConnection();
   const program = useAnchorProgram();
 
-  // 1. Try backend first (simple IDs like "abc123")
+  // 1. Try backend first (simple IDs like "abc123"), then fall back to on-chain
   useEffect(() => {
     if (!id) return;
     fetch(`${API_URL}/api/links/${id}`)
@@ -60,25 +63,25 @@ export default function PayPage({ params }: { params: Promise<{ id: string }> })
         setBackendLink(data);
         setStatus(data.status === "pagado" ? "settled" : "active");
       })
-      .catch(() => {
-        // Backend not found — try on-chain (Anchor-encoded ID)
-        if (program) tryOnChain();
-        else setStatus("not_found");
-      });
+      .catch(() => tryOnChain());
   }, [id]); // eslint-disable-line
 
-  // 2. On-chain fallback when program becomes available
-  useEffect(() => {
-    if (!backendLink && program && status === "loading") tryOnChain();
-  }, [program]); // eslint-disable-line
-
+  // Read the on-chain account with a read-only provider — no wallet connection needed
   async function tryOnChain() {
-    if (!id || !program) return;
+    if (!id) return;
     try {
       const { seller, linkId } = decodeLinkParam(id);
       const [pda] = getPaymentLinkPda(seller, linkId);
+      const dummyWallet = {
+        publicKey: PublicKey.default,
+        signTransaction: async <T extends Transaction | VersionedTransaction>(tx: T): Promise<T> => tx,
+        signAllTransactions: async <T extends Transaction | VersionedTransaction>(txs: T[]): Promise<T[]> => txs,
+      };
+      const provider = new AnchorProvider(connection, dummyWallet, { commitment: "confirmed" });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const data = await (program.account as any).paymentLink.fetch(pda);
+      const readProgram = new Program(IDL as any, provider);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const data = await (readProgram.account as any).paymentLink.fetch(pda);
       setLink(data);
       if (data.isSettled) setStatus("settled");
       else if (data.isPaid) setStatus("paid");
