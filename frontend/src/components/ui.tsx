@@ -55,7 +55,7 @@ export function VeloraMark({ size = 28, withText = true }: { size?: number; with
         <defs><linearGradient id="vmark" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="oklch(0.92 0.24 145)" /><stop offset="1" stopColor="oklch(0.78 0.16 165)" /></linearGradient></defs>
         <path d="M4 6 L10 6 L16 22 L22 6 L28 6 L19 26 L13 26 Z" fill="url(#vmark)" style={{ filter: "drop-shadow(0 0 8px oklch(0.92 0.24 145 / 0.5))" }} />
       </svg>
-      {withText && <span style={{ fontWeight: 600, fontSize: 18, letterSpacing: "-0.02em", color: "var(--ink)" }}>paylink</span>}
+      {withText && <span style={{ fontWeight: 600, fontSize: 18, letterSpacing: "-0.02em", color: "var(--ink)" }}>Velora</span>}
     </span>
   );
 }

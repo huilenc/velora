@@ -43,6 +43,9 @@ export default function PayPage({ params }: { params: Promise<{ id: string }> })
   const [error, setError] = useState<string | null>(null);
   const [paymentMode, setPaymentMode] = useState<"solana" | "crosschain">("solana");
   const [showConfirm, setShowConfirm] = useState(false);
+  const [x402Claiming, setX402Claiming] = useState(false);
+  const [x402Result, setX402Result] = useState<Record<string, unknown> | null>(null);
+  const [x402Error, setX402Error] = useState<string | null>(null);
 
   const { publicKey } = useWallet();
   const { connection } = useConnection();
@@ -112,6 +115,29 @@ export default function PayPage({ params }: { params: Promise<{ id: string }> })
     }
   }
 
+  async function claimX402Access() {
+    if (!id || !publicKey || !txSig) return;
+    setX402Claiming(true);
+    setX402Error(null);
+    setX402Result(null);
+    try {
+      const res = await fetch(`${API_URL}/api/resource/${id}`, {
+        headers: {
+          "X-Payment-Proof": txSig,
+          "X-Payment-Payer": publicKey.toBase58(),
+          "X-Payment-Link": id,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+      setX402Result(data as Record<string, unknown>);
+    } catch (err) {
+      setX402Error(err instanceof Error ? err.message : String(err));
+    } finally {
+      setX402Claiming(false);
+    }
+  }
+
   // Derived display values — works for both backend and on-chain links
   const amountUsdc = backendLink
     ? backendLink.amount
@@ -152,7 +178,7 @@ export default function PayPage({ params }: { params: Promise<{ id: string }> })
           <div style={{ fontSize: 48, marginBottom: 12 }}>🔗</div>
           <div style={{ fontSize: 20, fontWeight: 500 }}>Link not found</div>
           <div style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 8, lineHeight: 1.5 }}>This payment link doesn&apos;t exist or has been cancelled.</div>
-          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 20, height: 44, padding: "0 18px", borderRadius: 999, background: "oklch(1 0 0 / 0.06)", border: "1px solid oklch(1 0 0 / 0.10)", color: "var(--ink)", textDecoration: "none", fontSize: 13 }}>← Back to PayLink</Link>
+          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 8, marginTop: 20, height: 44, padding: "0 18px", borderRadius: 999, background: "oklch(1 0 0 / 0.06)", border: "1px solid oklch(1 0 0 / 0.10)", color: "var(--ink)", textDecoration: "none", fontSize: 13 }}>← Back to Velora</Link>
         </div>
       </div>
     </Centered>
@@ -190,6 +216,46 @@ export default function PayPage({ params }: { params: Promise<{ id: string }> })
           <div style={{ fontSize: 13, color: "var(--ink-3)", marginTop: 8, lineHeight: 1.5 }}>Funds are held on-chain. The seller will settle shortly.</div>
           {txSig && <a href={`https://explorer.solana.com/tx/${txSig}?cluster=devnet`} target="_blank" rel="noreferrer" style={{ display: "inline-block", marginTop: 16, fontSize: 12, color: "var(--acid)", fontFamily: "var(--font-mono), monospace" }}>View tx on Solana Explorer ↗</a>}
         </div>
+
+        {/* x402 gate — only visible for x402-enabled on-chain links */}
+        {!backendLink && link?.isX402 && (
+          <div style={{ margin: "0 20px 20px", padding: "16px", borderRadius: 14, background: "oklch(0.72 0.18 295 / 0.06)", border: "1px solid oklch(0.72 0.18 295 / 0.20)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <Icon name="bolt" size={14} stroke="var(--violet)" />
+              <span style={{ fontSize: 12, fontWeight: 600, color: "var(--violet)" }}>x402 Access Gate</span>
+            </div>
+            <div style={{ fontSize: 12, color: "var(--ink-3)", marginBottom: 12, lineHeight: 1.5 }}>
+              Your payment unlocks the protected resource. Claim access now — the server will verify your on-chain payment.
+            </div>
+
+            {!x402Result && (
+              <button
+                onClick={claimX402Access}
+                disabled={x402Claiming}
+                style={{ width: "100%", height: 40, borderRadius: 10, background: "oklch(0.72 0.18 295 / 0.20)", border: "1px solid oklch(0.72 0.18 295 / 0.40)", color: "var(--violet)", fontWeight: 600, fontSize: 13, cursor: x402Claiming ? "not-allowed" : "pointer", opacity: x402Claiming ? 0.7 : 1 }}
+              >
+                {x402Claiming ? "Verifying on-chain…" : "Claim Protected Resource"}
+              </button>
+            )}
+
+            {x402Error && (
+              <div style={{ marginTop: 10, padding: "10px 12px", borderRadius: 10, background: "oklch(0.78 0.16 25 / 0.10)", border: "1px solid oklch(0.78 0.16 25 / 0.25)", fontSize: 12, color: "var(--rose)" }}>
+                {x402Error}
+              </div>
+            )}
+
+            {x402Result && (
+              <div style={{ marginTop: 4, padding: "12px", borderRadius: 10, background: "oklch(0.92 0.24 145 / 0.08)", border: "1px solid oklch(0.92 0.24 145 / 0.30)" }}>
+                <div style={{ fontSize: 11, color: "var(--acid)", fontWeight: 600, marginBottom: 6, display: "flex", alignItems: "center", gap: 6 }}>
+                  <Icon name="check" size={12} stroke="var(--acid)" /> Access granted
+                </div>
+                <pre style={{ fontSize: 11, color: "var(--ink-2)", fontFamily: "var(--font-mono), monospace", whiteSpace: "pre-wrap", wordBreak: "break-all", margin: 0 }}>
+                  {JSON.stringify(x402Result, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Centered>
   );
@@ -306,8 +372,8 @@ export default function PayPage({ params }: { params: Promise<{ id: string }> })
 
         {/* Footer */}
         <div style={{ padding: "10px 20px", borderTop: "1px solid oklch(1 0 0 / 0.06)", fontSize: 10.5, color: "var(--ink-3)", display: "flex", justifyContent: "space-between" }}>
-          <span>Powered by PayLink · Anchor escrow on Solana</span>
-          <span style={{ fontFamily: "var(--font-mono), monospace" }}>paylink.xyz</span>
+          <span>Powered by Velora · Anchor escrow on Solana</span>
+          <span style={{ fontFamily: "var(--font-mono), monospace" }}>velora.xyz</span>
         </div>
       </div>
 

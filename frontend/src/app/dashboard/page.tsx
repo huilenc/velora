@@ -20,8 +20,8 @@ function Sidebar({ active }: { active: string }) {
     <aside style={{ width: 220, borderRight: "1px solid oklch(1 0 0 / 0.06)", padding: "18px 14px", background: "oklch(0.165 0.012 255)", display: "flex", flexDirection: "column", gap: 0, minHeight: "100vh", position: "fixed", top: 0, left: 0, bottom: 0, zIndex: 20 }}>
       <Link href="/" style={{ textDecoration: "none" }}><VeloraMark size={20} /></Link>
       <nav style={{ marginTop: 28, display: "flex", flexDirection: "column", gap: 2 }}>
-        {[["chart", "Overview", "/dashboard"], ["bolt", "Payments", "/dashboard"], ["link", "Links", "/dashboard"]].map(([ic, label, href], i) => {
-          const isActive = i === 0;
+        {([["chart", "Overview", "/dashboard"], ["bolt", "Payments", "/payments"], ["link", "Links", "/links"]] as [string, string, string][]).map(([ic, label, href]) => {
+          const isActive = active === label.toLowerCase();
           return (
             <Link key={label} href={href} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", borderRadius: 10, background: isActive ? "oklch(1 0 0 / 0.06)" : "transparent", color: isActive ? "var(--ink)" : "var(--ink-2)", textDecoration: "none", fontSize: 13, borderLeft: isActive ? "2px solid var(--acid)" : "2px solid transparent" }}>
               <Icon name={ic} size={16} />{label}
@@ -161,7 +161,7 @@ export default function Dashboard() {
     const [escrowVaultPda] = getEscrowVaultPda(publicKey, linkId);
     try {
       const txSig = await program.methods
-        .createPaymentLink(linkId, amountLamports, description || "PayLink payment", isX402, new BN(0))
+        .createPaymentLink(linkId, amountLamports, description || "Velora payment", isX402, new BN(0))
         .accounts({
           config: configPda, paymentLink: paymentLinkPda, escrowVault: escrowVaultPda,
           mint: USDC_MINT, seller: publicKey, tokenProgram: TOKEN_PROGRAM_ID,
@@ -169,14 +169,15 @@ export default function Dashboard() {
           systemProgram: SystemProgram.programId, rent: SYSVAR_RENT_PUBKEY,
         })
         .rpc();
-      saveLink({ id: encodeLinkParam(publicKey, linkId), linkId: linkId.toString(), amount: parseFloat(amount), description: description || "PayLink payment", createdAt: Date.now(), txSig });
+      saveLink({ id: encodeLinkParam(publicKey, linkId), linkId: linkId.toString(), amount: parseFloat(amount), description: description || "Velora payment", createdAt: Date.now(), txSig });
     } catch (e) {
       throw new Error(parseAnchorError(e));
     }
   }
 
   function copyLink(id: string) {
-    navigator.clipboard.writeText(`${window.location.origin}/pay/${id}`);
+    const base = process.env.NEXT_PUBLIC_APP_URL ?? window.location.origin;
+    navigator.clipboard.writeText(`${base}/pay/${id}`);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
   }

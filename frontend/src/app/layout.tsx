@@ -14,7 +14,7 @@ const instrumentSerif = Instrument_Serif({
 });
 
 export const metadata: Metadata = {
-  title: "PayLink — Get paid in crypto, receive USDC on Solana",
+  title: "Velora — Get paid in crypto, receive USDC on Solana",
   description: "Generate a link. Accept any token from any chain. Receive USDC on Solana instantly.",
 };
 

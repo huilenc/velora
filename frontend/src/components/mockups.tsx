@@ -92,8 +92,8 @@ export function PaymentPageDemo() {
       )}
 
       <div style={{ padding: "10px 20px", borderTop: "1px solid oklch(1 0 0 / 0.06)", fontSize: 10.5, color: "var(--ink-3)", display: "flex", justifyContent: "space-between" }}>
-        <span>Powered by paylink</span>
-        <span style={{ fontFamily: "var(--font-mono), monospace" }}>paylink.xyz/pay/demo</span>
+        <span>Powered by Velora</span>
+        <span style={{ fontFamily: "var(--font-mono), monospace" }}>velora.xyz/pay/demo</span>
       </div>
     </div>
   );

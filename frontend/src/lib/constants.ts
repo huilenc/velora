@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 
 export const PROGRAM_ID = new PublicKey(
-  "8SuWfRSyqJxpXXQ57S2hmiwKgFqpf877Gyf89yky8KhC"
+  "CoZag4akYjdga6TLTaDRXSv49ArbJjWtz5gFiJNNNNpG"
 );
 
 // Devnet USDC (Circle faucet)

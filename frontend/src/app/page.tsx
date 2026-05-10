@@ -26,18 +26,20 @@ function Nav() {
   );
 }
 
-// ── Connect Wallet button — shows confirm dialog before dashboard ─────────
-function WalletCTA({ size = 44 }: { size?: number }) {
-  const { publicKey, disconnect } = useWallet();
+// ── Redirect to dashboard once wallet connects (rendered once in Home) ──────
+function WalletRedirect() {
+  const { publicKey } = useWallet();
   const router = useRouter();
-  const [mounted, setMounted] = React.useState(false);
-  const [showConfirm, setShowConfirm] = React.useState(false);
-
-  React.useEffect(() => setMounted(true), []);
-
   React.useEffect(() => {
-    if (publicKey) setShowConfirm(true);
-  }, [publicKey]);
+    if (publicKey) router.replace("/dashboard");
+  }, [publicKey, router]);
+  return null;
+}
+
+// ── Connect Wallet button ───────────────────────────────────────────────────
+function WalletCTA({ size = 44 }: { size?: number }) {
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
 
   if (!mounted) {
     return (
@@ -49,48 +51,7 @@ function WalletCTA({ size = 44 }: { size?: number }) {
     );
   }
 
-  return (
-    <>
-      <WalletMultiButton style={{ height: size }}>Connect Wallet</WalletMultiButton>
-
-      {showConfirm && publicKey && (
-        <div
-          onClick={() => { setShowConfirm(false); disconnect(); }}
-          style={{ position: "fixed", inset: 0, zIndex: 200, background: "oklch(0.10 0.01 255 / 0.72)", backdropFilter: "blur(14px)", display: "grid", placeItems: "center", animation: "fadeIn .2s ease-out" }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{ width: 400, padding: "28px 28px 24px", borderRadius: 22, background: "linear-gradient(180deg, oklch(0.22 0.014 255), oklch(0.17 0.012 255))", border: "1px solid oklch(1 0 0 / 0.12)", boxShadow: "0 40px 100px -20px oklch(0 0 0 / 0.6)", animation: "popIn .35s cubic-bezier(.16,1,.3,1)" }}
-          >
-            <div style={{ width: 48, height: 48, borderRadius: "50%", background: "oklch(0.92 0.24 145 / 0.15)", border: "1px solid oklch(0.92 0.24 145 / 0.4)", display: "grid", placeItems: "center", color: "var(--acid)", marginBottom: 16 }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12V22H4V12" /><path d="M22 7H2v5h20V7z" /><path d="M12 22V7" /><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" /><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" /></svg>
-            </div>
-            <div style={{ fontSize: 18, fontWeight: 500, marginBottom: 8 }}>Wallet connected</div>
-            <div style={{ fontSize: 13, color: "var(--ink-3)", marginBottom: 6, fontFamily: "var(--font-mono), monospace", background: "oklch(1 0 0 / 0.03)", padding: "8px 10px", borderRadius: 8, border: "1px solid oklch(1 0 0 / 0.06)", wordBreak: "break-all" }}>
-              {publicKey.toBase58().slice(0, 20)}…{publicKey.toBase58().slice(-8)}
-            </div>
-            <div style={{ fontSize: 13, color: "var(--ink-2)", marginBottom: 22, lineHeight: 1.5 }}>
-              Proceed to your PayLink dashboard to create and manage payment links.
-            </div>
-            <div style={{ display: "flex", gap: 10 }}>
-              <button
-                onClick={() => { setShowConfirm(false); router.push("/dashboard"); }}
-                style={{ flex: 1, height: 44, borderRadius: 12, background: "var(--acid)", color: "#0a0c0a", border: "none", fontWeight: 600, fontSize: 14, cursor: "pointer" }}
-              >
-                Go to Dashboard →
-              </button>
-              <button
-                onClick={() => { setShowConfirm(false); disconnect(); }}
-                style={{ height: 44, padding: "0 16px", borderRadius: 12, background: "oklch(1 0 0 / 0.05)", border: "1px solid oklch(1 0 0 / 0.10)", color: "var(--ink-2)", fontSize: 14, cursor: "pointer" }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
+  return <WalletMultiButton style={{ height: size }}>Connect Wallet</WalletMultiButton>;
 }
 
 // ── Hero ───────────────────────────────────────────────────────────────────
@@ -208,7 +169,7 @@ function Features() {
           <h2 style={{ margin: 0, fontSize: "clamp(36px, 4.4vw, 64px)", letterSpacing: "-0.03em", lineHeight: 1.02, fontWeight: 500 }}>
             Everything you need to <span style={{ fontFamily: "var(--font-serif), serif", fontStyle: "italic", color: "var(--acid)" }}>accept&nbsp;crypto</span><br />without thinking about crypto.
           </h2>
-          <p style={{ margin: 0, color: "var(--ink-2)", maxWidth: 640, fontSize: 18, lineHeight: 1.5 }}>PayLink handles wallet connection, chain bridging, token swaps, and final settlement — so your customers pay with whatever they have, and you receive USDC on Solana.</p>
+          <p style={{ margin: 0, color: "var(--ink-2)", maxWidth: 640, fontSize: 18, lineHeight: 1.5 }}>Velora handles wallet connection, chain bridging, token swaps, and final settlement — so your customers pay with whatever they have, and you receive USDC on Solana.</p>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gridAutoRows: "minmax(220px, auto)", gap: 16 }}>
           <BentoCard span="3 / span 3" rowSpan={2}>
@@ -280,7 +241,7 @@ function ProductPreview() {
     <section style={{ padding: "80px 0 100px", position: "relative" }}>
       <div className="container">
         <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 56 }}>
-          <span className="eyebrow"><Icon name="eye" size={12} /> Inside PayLink</span>
+          <span className="eyebrow"><Icon name="eye" size={12} /> Inside Velora</span>
           <h2 style={{ margin: 0, fontSize: "clamp(36px, 4.4vw, 64px)", letterSpacing: "-0.03em", lineHeight: 1.02, fontWeight: 500 }}>
             One dashboard. <span style={{ fontFamily: "var(--font-serif), serif", fontStyle: "italic" }}>Every</span> chain.
           </h2>
@@ -337,8 +298,8 @@ function Footer() {
         ))}
       </div>
       <div className="container" style={{ marginTop: 40, paddingTop: 24, borderTop: "1px dashed oklch(1 0 0 / 0.06)", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "var(--ink-3)" }}>
-        <span>© 2026 PayLink · Built for the Solana / ElevenLabs hackathon</span>
-        <span style={{ fontFamily: "var(--font-mono), monospace" }}>paylink.xyz</span>
+        <span>© 2026 Velora · Built for the Solana / ElevenLabs hackathon</span>
+        <span style={{ fontFamily: "var(--font-mono), monospace" }}>velora.xyz</span>
       </div>
     </footer>
   );
@@ -348,6 +309,7 @@ function Footer() {
 export default function Home() {
   return (
     <div>
+      <WalletRedirect />
       <Nav />
       <Hero />
       <MetricsTicker />

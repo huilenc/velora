@@ -1,12 +1,10 @@
-// Anchor 0.31 IDL — struct layouts in types[], accounts[] holds name+discriminator only.
-// Discriminators are placeholders; replace with `anchor build` output once deployed.
 export const IDL = {
-  address: "8SuWfRSyqJxpXXQ57S2hmiwKgFqpf877Gyf89yky8KhC",
+  address: "CoZag4akYjdga6TLTaDRXSv49ArbJjWtz5gFiJNNNNpG",
   metadata: { name: "workspace", version: "0.1.0", spec: "0.1.0" },
   instructions: [
     {
       name: "initializeConfig",
-      discriminator: [0,0,0,0,0,0,0,0],
+      discriminator: [208,127,21,1,194,190,196,70],
       accounts: [
         { name: "config", writable: true },
         { name: "authority", writable: true, signer: true },
@@ -19,7 +17,7 @@ export const IDL = {
     },
     {
       name: "createPaymentLink",
-      discriminator: [0,0,0,0,0,0,0,1],
+      discriminator: [63,160,253,85,190,156,32,55],
       accounts: [
         { name: "config", writable: true },
         { name: "paymentLink", writable: true },
@@ -41,7 +39,7 @@ export const IDL = {
     },
     {
       name: "pay",
-      discriminator: [0,0,0,0,0,0,0,2],
+      discriminator: [119,18,216,65,192,117,122,220],
       accounts: [
         { name: "config", writable: true },
         { name: "paymentLink", writable: true },
@@ -54,7 +52,7 @@ export const IDL = {
     },
     {
       name: "settle",
-      discriminator: [0,0,0,0,0,0,0,3],
+      discriminator: [175,42,185,87,144,131,102,212],
       accounts: [
         { name: "config" },
         { name: "paymentLink", writable: true },
@@ -68,7 +66,7 @@ export const IDL = {
     },
     {
       name: "cancelPayment",
-      discriminator: [0,0,0,0,0,0,0,4],
+      discriminator: [217,129,71,37,216,193,38,33],
       accounts: [
         { name: "paymentLink", writable: true },
         { name: "escrowVault", writable: true },
@@ -80,7 +78,7 @@ export const IDL = {
     },
     {
       name: "x402Verify",
-      discriminator: [0,0,0,0,0,0,0,5],
+      discriminator: [72,51,182,11,36,46,166,187],
       accounts: [
         { name: "paymentLink" },
         { name: "requester", signer: true },
@@ -89,7 +87,7 @@ export const IDL = {
     },
     {
       name: "updateConfig",
-      discriminator: [0,0,0,0,0,0,0,6],
+      discriminator: [29,158,252,191,10,83,219,99],
       accounts: [
         { name: "config", writable: true },
         { name: "authority", signer: true },
@@ -102,8 +100,8 @@ export const IDL = {
     },
   ],
   accounts: [
-    { name: "Config",      discriminator: [0,0,0,0,0,0,0,0] },
-    { name: "PaymentLink", discriminator: [0,0,0,0,0,0,0,1] },
+    { name: "Config",      discriminator: [155,12,170,224,30,250,204,130] },
+    { name: "PaymentLink", discriminator: [169,247,147,189,39,239,14,38] },
   ],
   types: [
     {
