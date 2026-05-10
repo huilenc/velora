@@ -1,5 +1,3 @@
-import { randomUUID } from "crypto";
-
 export interface PaymentLink {
   id: string;
   amount: number;
@@ -9,45 +7,36 @@ export interface PaymentLink {
   createdAt: string;
 }
 
-// Base de datos en memoria por ahora (para el hackathon está perfecto)
-export const db: PaymentLink[] = [
-  {
-    id: "abc123",
-    amount: 200,
-    description: "Diseño de logo",
-    seller: "gloria.sol",
-    status: "pagado",
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "xyz789",
-    amount: 500,
-    description: "Website completo",
-    seller: "gloria.sol",
-    status: "pendiente",
-    createdAt: new Date().toISOString(),
-  },
-];
-
+// Encode link data into the ID itself — no database, no cold-start loss.
 export function createLink(amount: number, description: string, seller: string): PaymentLink {
-  const link: PaymentLink = {
-    id: randomUUID().slice(0, 8),
-    amount,
-    description,
-    seller,
-    status: "pendiente",
-    createdAt: new Date().toISOString(),
-  };
-  db.push(link);
-  return link;
+  const createdAt = new Date().toISOString();
+  const payload = JSON.stringify({ amount, description, seller, createdAt });
+  const id = Buffer.from(payload).toString("base64url");
+  return { id, amount, description, seller, status: "pendiente", createdAt };
 }
 
-export function getLinkById(id: string): PaymentLink | undefined {
-  return db.find((l) => l.id === id);
+export function getLinkById(id: string): PaymentLink | null {
+  try {
+    const payload = JSON.parse(Buffer.from(id, "base64url").toString("utf8"));
+    if (typeof payload.amount !== "number" || !payload.seller) return null;
+    return {
+      id,
+      amount: payload.amount,
+      description: payload.description ?? "",
+      seller: payload.seller,
+      status: "pendiente",
+      createdAt: payload.createdAt ?? new Date().toISOString(),
+    };
+  } catch {
+    return null;
+  }
 }
 
-export function markAsPaid(id: string): PaymentLink | undefined {
-  const link = db.find((l) => l.id === id);
-  if (link) link.status = "pagado";
-  return link;
+// Payment status is tracked on-chain — nothing to persist here.
+export function markAsPaid(_id: string): PaymentLink | null {
+  return null;
+}
+
+export function getAllLinks(): PaymentLink[] {
+  return [];
 }
