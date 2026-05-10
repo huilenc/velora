@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // Silence the "multiple lockfiles" warning — root is paylink/, not C:\Users\Abraham
+  outputFileTracingRoot: path.join(__dirname, "../"),
   transpilePackages: ["@lifi/widget", "@lifi/sdk"],
   webpack: (config, { isServer }) => {
     if (!isServer) {

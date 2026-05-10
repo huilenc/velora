@@ -1,11 +1,10 @@
 "use client";
-import { ReactNode, useMemo } from "react";
+import { ReactNode } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { PhantomWalletAdapter, SolflareWalletAdapter } from "@solana/wallet-adapter-wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { mainnet, polygon, arbitrum, optimism, base, bsc } from "wagmi/chains";
@@ -28,16 +27,12 @@ const queryClient = new QueryClient({
 });
 
 export function Providers({ children }: { children: ReactNode }) {
-  const wallets = useMemo(
-    () => [new PhantomWalletAdapter(), new SolflareWalletAdapter()],
-    []
-  );
-
   return (
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <ConnectionProvider endpoint={RPC_URL}>
-          <WalletProvider wallets={wallets} autoConnect={false}>
+          {/* Empty wallets array — Wallet Standard (Phantom, Solflare) auto-registers */}
+          <WalletProvider wallets={[]} autoConnect={false}>
             <WalletModalProvider>{children}</WalletModalProvider>
           </WalletProvider>
         </ConnectionProvider>
